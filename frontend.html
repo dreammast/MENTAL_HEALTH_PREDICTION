@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Mind - Mental Health Support Chatbot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4a90e2 0%, #5b67d6 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background-color: #4cd964;
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #4a90e2;
+        }
+        
+        .feature-btn {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .feature-btn:hover {
+            background-color: #e8f0fe;
+            border-color: #c6d8f5;
+        }
+        
+        .feature-icon {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+        
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        .bot-message {
+            background-color: #e8f0fe;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            color: #1f2937;
+        }
+        
+        .user-message {
+            background-color: #4a90e2;
+            color: white;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        
+        .chat-input {
+            padding: 15px 20px;
+            background-color: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 24px;
+            outline: none;
+            font-size: 15px;
+        }
+        
+        .chat-input input:focus {
+            border-color: #4a90e2;
+        }
+        
+        .send-btn {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .send-btn:hover {
+            background-color: #3a7cd6;
+        }
+        
+        .assessment-container {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid #e9ecef;
+            display: none;
+        }
+        
+        .chart-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
+        }
+        
+        .recommendations {
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .recommendations h4 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-item {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .recommendation-item:before {
+            content: "•";
+            color: #4a90e2;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-reply {
+            background-color: #e8f0fe;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .quick-reply:hover {
+            background-color: #d0e2fc;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Campus Mind</div>
+            <div class="tagline">Your AI Mental Health Companion</div>
+            <div class="status-indicator"></div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Mental Health Tools</div>
+                    <div class="feature-btn" onclick="startAssessment()">
+                        <span class="feature-icon">📊</span> Mental Health Assessment
+                    </div>
+                    <div class="feature-btn" onclick="showMoodTracker()">
+                        <span class="feature-icon">📝</span> Mood Tracker
+                    </div>
+                    <div class="feature-btn" onclick="showMindfulness()">
+                        <span class="feature-icon">🧠</span> Mindfulness Exercises
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Support Resources</div>
+                    <div class="feature-btn" onclick="connectWithPeers()">
+                        <span class="feature-icon">👥</span> Connect with Peers
+                    </div>
+                    <div class="feature-btn" onclick="showTherapists()">
+                        <span class="feature-icon">🩺</span> Therapist Sessions
+                    </div>
+                    <div class="feature-btn" onclick="showResources()">
+                        <span class="feature-icon">📚</span> Self-Help Resources
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Career Guidance</div>
+                    <div class="feature-btn" onclick="startCareerAssessment()">
+                        <span class="feature-icon">🎯</span> Career Assessment
+                    </div>
+                    <div class="feature-btn" onclick="showSkillDevelopment()">
+                        <span class="feature-icon">📈</span> Skill Development
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    Chat with Mindy - Your Mental Health Assistant
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi there! I'm Mindy, your mental health companion. How are you feeling today?
+                        <div class="message-time">Just now</div>
+                        
+                        <div class="quick-replies">
+                            <button class="quick-reply" onclick="sendQuickReply('I\'m feeling good today')">I'm feeling good</button>
+                            <button class="quick-reply" onclick="sendQuickReply('I\'m a bit stressed')">I'm stressed</button>
+                            <button class="quick-reply" onclick="sendQuickReply('I\'m feeling anxious')">I'm anxious</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="assessment-container" id="assessmentContainer">
+            <h3>Your Mental Health Assessment Results</h3>
+            
+            <div class="chart-container">
+                <canvas id="assessmentChart"></canvas>
+            </div>
+            
+            <div class="recommendations">
+                <h4>Personalized Recommendations</h4>
+                <div class="recommendation-item">Practice mindfulness meditation for 10 minutes daily</div>
+                <div class="recommendation-item">Try the breathing exercises in the toolkit</div>
+                <div class="recommendation-item">Consider connecting with a peer supporter</div>
+                <div class="recommendation-item">Schedule a session with a counselor next week</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const assessmentContainer = document.getElementById('assessmentContainer');
+        
+        // Sample assessment data
+        const assessmentData = {
+            labels: ['Anxiety', 'Depression', 'Stress', 'Well-being'],
+            datasets: [{
+                data: [30, 20, 25, 25],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+            }]
+        };
+        
+        // Initialize the chart
+        let assessmentChart;
+        
+        function renderChart() {
+            const ctx = document.getElementById('assessmentChart').getContext('2d');
+            if (assessmentChart) {
+                assessmentChart.destroy();
+            }
+            assessmentChart = new Chart(ctx, {
+                type: 'pie',
+                data: assessmentData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                ${text}
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // LLM Integration with Groq Backend
+        class MentalHealthBot {
+            constructor() {
+                this.apiEndpoint = 'http://localhost:5000/api/chat';
+                this.conversationId = null;
+            }
+            
+            async sendMessage(message) {
+                try {
+                    const response = await fetch(this.apiEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            conversation_id: this.conversationId
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.conversationId = data.conversation_id;
+                        return {
+                            content: data.response,
+                            emotion: data.analysis.emotion,
+                            urgency: data.analysis.urgency,
+                            requiresHumanIntervention: data.analysis.requires_intervention,
+                            suggestions: data.analysis.suggestions
+                        };
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                } catch (error) {
+                    console.error('Bot Error:', error);
+                    return {
+                        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+                        emotion: 'neutral',
+                        urgency: 'low',
+                        requiresHumanIntervention: false,
+                        suggestions: []
+                    };
+                }
+            }
+            
+            // Crisis detection for additional safety
+            detectCrisis(message) {
+                const crisisKeywords = [
+                    'suicide', 'kill myself', 'end it all', 'want to die',
+                    'harm myself', 'not worth living', 'better off dead'
+                ];
+                
+                const lowerMessage = message.toLowerCase();
+                return crisisKeywords.some(keyword => lowerMessage.includes(keyword));
+            }
+            
+            getCrisisResponse() {
+                return {
+                    content: "I'm really concerned about what you're sharing. Your life has value and there are people who want to help. Please reach out to a crisis helpline immediately:\n\n• National Suicide Prevention Lifeline: 988\n• Crisis Text Line: Text HOME to 741741\n• Campus counseling center\n\nYou don't have to go through this alone. Professional help is available 24/7.",
+                    emotion: 'crisis',
+                    urgency: 'crisis',
+                    requiresHumanIntervention: true,
+                    suggestions: ['Contact crisis helpline', 'Reach out to campus counseling', 'Talk to a trusted friend or family member']
+                };
+            }
+        }
+        
+        // Initialize the bot
+        const mentalHealthBot = new MentalHealthBot();
+        
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+            
+            // Add user message to chat
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // Check for crisis content first
+            if (mentalHealthBot.detectCrisis(message)) {
+                const crisisResponse = mentalHealthBot.getCrisisResponse();
+                addMessage(crisisResponse.content);
+                addSuggestions(crisisResponse.suggestions);
+                return;
+            }
+            
+            // Show typing indicator
+            const typingIndicator = addMessage('Mindy is typing...');
+            
+            // Send to LLM backend
+            mentalHealthBot.sendMessage(message).then(response => {
+                // Remove typing indicator
+                if (typingIndicator && typingIndicator.remove) {
+                    typingIndicator.remove();
+                }
+                
+                // Add bot response
+                addMessage(response.content);
+                
+                // Handle crisis situations
+                if (response.requiresHumanIntervention) {
+                    addMessage("⚠️ I've detected that you might need immediate support. Please consider reaching out to a mental health professional or crisis helpline.");
+                }
+                
+                // Add suggestions if available
+                if (response.suggestions && response.suggestions.length > 0) {
+                    addSuggestions(response.suggestions);
+                }
+            }).catch(error => {
+                typingIndicator.remove();
+                addMessage("I'm sorry, I'm having trouble connecting right now. Please try again in a moment.");
+            });
+        }
+        
+        function sendQuickReply(text) {
+            addMessage(text, true);
+            
+            // Check for crisis content first
+            if (mentalHealthBot.detectCrisis(text)) {
+                const crisisResponse = mentalHealthBot.getCrisisResponse();
+                addMessage(crisisResponse.content);
+                addSuggestions(crisisResponse.suggestions);
+                return;
+            }
+            
+            const typingIndicator = addMessage('Mindy is typing...');
+            
+            mentalHealthBot.sendMessage(text).then(response => {
+                if (typingIndicator && typingIndicator.remove) {
+                    typingIndicator.remove();
+                }
+                addMessage(response.content);
+                
+                if (response.requiresHumanIntervention) {
+                    addMessage("⚠️ I've detected that you might need immediate support. Please consider reaching out to a mental health professional or crisis helpline.");
+                }
+                
+                if (response.suggestions && response.suggestions.length > 0) {
+                    addSuggestions(response.suggestions);
+                }
+            }).catch(error => {
+                typingIndicator.remove();
+                addMessage("I'm sorry, I'm having trouble connecting right now. Please try again in a moment.");
+            });
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function addSuggestions(suggestions) {
+            const chatMessages = document.getElementById('chatMessages');
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'quick-replies';
+            
+            suggestions.forEach(suggestion => {
+                const button = document.createElement('button');
+                button.className = 'quick-reply';
+                button.textContent = suggestion;
+                button.onclick = () => sendQuickReply(suggestion);
+                suggestionsDiv.appendChild(button);
+            });
+            
+            chatMessages.appendChild(suggestionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function botResponse(userMessage) {
+            // This function is now replaced by the LLM integration
+            // Keeping it for backward compatibility but it won't be used
+            console.log('botResponse called but LLM integration is active');
+        }
+        
+        function startAssessment() {
+            addMessage("Starting mental health assessment...", true);
+            
+            setTimeout(() => {
+                addMessage("Great! Let's start with a quick assessment. On a scale of 1-10, how would you rate your overall mood this week?");
+                
+                const quickReplies = document.createElement('div');
+                quickReplies.className = 'quick-replies';
+                
+                for (let i = 1; i <= 5; i++) {
+                    const button = document.createElement('button');
+                    button.className = 'quick-reply';
+                    button.textContent = i;
+                    button.onclick = function() {
+                        continueAssessment(i);
+                    };
+                    quickReplies.appendChild(button);
+                }
+                
+                const messageDiv = chatMessages.lastChild;
+                messageDiv.appendChild(quickReplies);
+            }, 1000);
+        }
+        
+        // Mood Tracker Implementation
+        function showMoodTracker() {
+            addMessage("📝 Mood Tracker", true);
+            
+            setTimeout(() => {
+                addMessage("Let's track your mood! How are you feeling right now?");
+                
+                const moodOptions = [
+                    { emoji: "😊", mood: "Happy", color: "#4CAF50" },
+                    { emoji: "😐", mood: "Neutral", color: "#FFC107" },
+                    { emoji: "😔", mood: "Sad", color: "#2196F3" },
+                    { emoji: "😰", mood: "Anxious", color: "#FF5722" },
+                    { emoji: "😤", mood: "Frustrated", color: "#F44336" },
+                    { emoji: "😴", mood: "Tired", color: "#9C27B0" }
+                ];
+                
+                const moodContainer = document.createElement('div');
+                moodContainer.className = 'mood-tracker-container';
+                moodContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+                    margin: 15px 0;
+                    padding: 15px;
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                `;
+                
+                moodOptions.forEach(option => {
+                    const moodButton = document.createElement('button');
+                    moodButton.className = 'mood-option';
+                    moodButton.style.cssText = `
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        padding: 15px;
+                        border: 2px solid ${option.color};
+                        border-radius: 10px;
+                        background: white;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        font-size: 14px;
+                    `;
+                    moodButton.innerHTML = `
+                        <span style="font-size: 24px; margin-bottom: 5px;">${option.emoji}</span>
+                        <span>${option.mood}</span>
+                    `;
+                    
+                    moodButton.onclick = () => {
+                        addMessage(`I'm feeling ${option.mood.toLowerCase()} today`, true);
+                        setTimeout(() => {
+                            addMessage(`Thank you for sharing! I've recorded your mood as "${option.mood}". Would you like to add any notes about what's contributing to this feeling?`);
+                            
+                            const notesContainer = document.createElement('div');
+                            notesContainer.className = 'mood-notes';
+                            notesContainer.innerHTML = `
+                                <textarea placeholder="Optional: What's contributing to this mood?" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin: 10px 0; resize: vertical; min-height: 60px;"></textarea>
+                                <button onclick="saveMoodEntry()" style="background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Save Entry</button>
+                            `;
+                            chatMessages.appendChild(notesContainer);
+                        }, 1000);
+                    };
+                    
+                    moodContainer.appendChild(moodButton);
+                });
+                
+                chatMessages.appendChild(moodContainer);
+            }, 1000);
+        }
+        
+        function saveMoodEntry() {
+            addMessage("Mood entry saved! 📊 Your mood tracking data helps identify patterns over time.", true);
+            setTimeout(() => {
+                addMessage("Would you like to view your mood history or continue tracking?");
+                
+                const quickReplies = document.createElement('div');
+                quickReplies.className = 'quick-replies';
+                
+                const options = ["View Mood History", "Track Another Mood", "Back to Chat"];
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'quick-reply';
+                    button.textContent = option;
+                    button.onclick = () => {
+                        if (option === "View Mood History") {
+                            showMoodHistory();
+                        } else if (option === "Track Another Mood") {
+                            showMoodTracker();
+                        } else {
+                            addMessage("How else can I help you today?", true);
+                        }
+                    };
+                    quickReplies.appendChild(button);
+                });
+                
+                chatMessages.appendChild(quickReplies);
+            }, 1000);
+        }
+        
+        function showMoodHistory() {
+            addMessage("📊 Your Mood History (Last 7 Days)", true);
+            
+            setTimeout(() => {
+                const historyData = [
+                    { day: "Monday", mood: "😊 Happy", note: "Great day at work" },
+                    { day: "Tuesday", mood: "😐 Neutral", note: "Regular day" },
+                    { day: "Wednesday", mood: "😰 Anxious", note: "Presentation stress" },
+                    { day: "Thursday", mood: "😊 Happy", note: "Met with friends" },
+                    { day: "Friday", mood: "😤 Frustrated", note: "Traffic issues" },
+                    { day: "Saturday", mood: "😴 Tired", note: "Long week" },
+                    { day: "Sunday", mood: "😊 Happy", note: "Relaxing day" }
+                ];
+                
+                const historyContainer = document.createElement('div');
+                historyContainer.className = 'mood-history';
+                historyContainer.style.cssText = `
+                    background: white;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                
+                historyData.forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.style.cssText = `
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        border-bottom: 1px solid #eee;
+                    `;
+                    entryDiv.innerHTML = `
+                        <div>
+                            <strong>${entry.day}</strong>
+                            <div style="color: #666; font-size: 12px;">${entry.note}</div>
+                        </div>
+                        <span style="font-size: 20px;">${entry.mood}</span>
+                    `;
+                    historyContainer.appendChild(entryDiv);
+                });
+                
+                chatMessages.appendChild(historyContainer);
+            }, 1000);
+        }
+        
+        // Mindfulness Exercises Implementation
+        function showMindfulness() {
+            addMessage("🧠 Mindfulness Exercises", true);
+            
+            setTimeout(() => {
+                addMessage("Choose a mindfulness exercise to help you relax and focus:");
+                
+                const exercises = [
+                    { name: "Breathing Exercise", duration: "5 min", description: "Guided breathing for relaxation" },
+                    { name: "Body Scan", duration: "10 min", description: "Progressive muscle relaxation" },
+                    { name: "Mindful Walking", duration: "15 min", description: "Walking meditation" },
+                    { name: "Gratitude Practice", duration: "3 min", description: "Focus on positive thoughts" },
+                    { name: "Visualization", duration: "8 min", description: "Peaceful scene meditation" }
+                ];
+                
+                const exerciseContainer = document.createElement('div');
+                exerciseContainer.className = 'mindfulness-container';
+                exerciseContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 10px;
+                    margin: 15px 0;
+                `;
+                
+                exercises.forEach(exercise => {
+                    const exerciseCard = document.createElement('div');
+                    exerciseCard.className = 'exercise-card';
+                    exerciseCard.style.cssText = `
+                        background: white;
+                        border: 2px solid #4a90e2;
+                        border-radius: 10px;
+                        padding: 15px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        text-align: center;
+                    `;
+                    exerciseCard.innerHTML = `
+                        <h4 style="margin: 0 0 10px 0; color: #4a90e2;">${exercise.name}</h4>
+                        <p style="margin: 5px 0; color: #666; font-size: 12px;">${exercise.description}</p>
+                        <span style="background: #4a90e2; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">${exercise.duration}</span>
+                    `;
+                    
+                    exerciseCard.onclick = () => {
+                        startMindfulnessExercise(exercise);
+                    };
+                    
+                    exerciseContainer.appendChild(exerciseCard);
+                });
+                
+                chatMessages.appendChild(exerciseContainer);
+            }, 1000);
+        }
+        
+        function startMindfulnessExercise(exercise) {
+            addMessage(`Starting ${exercise.name}...`, true);
+            
+            setTimeout(() => {
+                addMessage(`🧘‍♀️ ${exercise.name} (${exercise.duration})`);
+                
+                const exerciseContent = document.createElement('div');
+                exerciseContent.className = 'exercise-content';
+                exerciseContent.style.cssText = `
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 10px 0;
+                    text-align: center;
+                `;
+                
+                if (exercise.name === "Breathing Exercise") {
+                    exerciseContent.innerHTML = `
+                        <h3>🌬️ Breathing Exercise</h3>
+                        <div id="breathing-circle" style="width: 100px; height: 100px; border: 3px solid white; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">Breathe In</div>
+                        <p>Follow the circle - breathe in as it expands, breathe out as it contracts</p>
+                        <button onclick="stopExercise()" style="background: white; color: #4a90e2; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">Stop Exercise</button>
+                    `;
+                    startBreathingAnimation();
+                } else if (exercise.name === "Gratitude Practice") {
+                    exerciseContent.innerHTML = `
+                        <h3>🙏 Gratitude Practice</h3>
+                        <p>Think of 3 things you're grateful for today:</p>
+                        <div style="margin: 20px 0;">
+                            <input type="text" placeholder="1. Something you're grateful for..." style="width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 5px;">
+                            <input type="text" placeholder="2. Another thing you're grateful for..." style="width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 5px;">
+                            <input type="text" placeholder="3. One more thing you're grateful for..." style="width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 5px;">
+                        </div>
+                        <button onclick="completeGratitude()" style="background: white; color: #4a90e2; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Complete Practice</button>
+                    `;
+                } else {
+                    exerciseContent.innerHTML = `
+                        <h3>🧘‍♀️ ${exercise.name}</h3>
+                        <p>Find a comfortable position and follow the guided instructions:</p>
+                        <div style="margin: 20px 0; font-size: 18px;">
+                            <p>1. Close your eyes gently</p>
+                            <p>2. Take a deep breath</p>
+                            <p>3. Focus on your breathing</p>
+                            <p>4. Let thoughts come and go</p>
+                            <p>5. Stay present in the moment</p>
+                        </div>
+                        <button onclick="stopExercise()" style="background: white; color: #4a90e2; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">End Exercise</button>
+                    `;
+                }
+                
+                chatMessages.appendChild(exerciseContent);
+            }, 1000);
+        }
+        
+        function startBreathingAnimation() {
+            const circle = document.getElementById('breathing-circle');
+            let isInhaling = true;
+            let size = 100;
+            
+            const animate = () => {
+                if (isInhaling) {
+                    size += 2;
+                    if (size >= 120) {
+                        isInhaling = false;
+                        circle.textContent = 'Breathe Out';
+                    }
+                } else {
+                    size -= 2;
+                    if (size <= 100) {
+                        isInhaling = true;
+                        circle.textContent = 'Breathe In';
+                    }
+                }
+                circle.style.width = size + 'px';
+                circle.style.height = size + 'px';
+                
+                if (document.getElementById('breathing-circle')) {
+                    setTimeout(animate, 100);
+                }
+            };
+            animate();
+        }
+        
+        function stopExercise() {
+            addMessage("Exercise completed! How do you feel now?", true);
+        }
+        
+        function completeGratitude() {
+            addMessage("Gratitude practice completed! Focusing on positive things can improve your mood.", true);
+        }
+        
+        // Connect with Peers Implementation
+        function connectWithPeers() {
+            addMessage("👥 Connect with Peers", true);
+            
+            setTimeout(() => {
+                addMessage("Connect with other students who understand what you're going through:");
+                
+                const peerGroups = [
+                    { name: "Anxiety Support Group", members: 24, activity: "Active", description: "Students dealing with anxiety and stress" },
+                    { name: "Study Stress Relief", members: 18, activity: "Active", description: "Managing academic pressure together" },
+                    { name: "Mindfulness Community", members: 32, activity: "Very Active", description: "Daily meditation and mindfulness practices" },
+                    { name: "Career Guidance", members: 15, activity: "Active", description: "Supporting each other's career journeys" },
+                    { name: "General Wellness", members: 45, activity: "Active", description: "General mental health and wellness discussions" }
+                ];
+                
+                const groupsContainer = document.createElement('div');
+                groupsContainer.className = 'peer-groups';
+                groupsContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 15px;
+                    margin: 15px 0;
+                `;
+                
+                peerGroups.forEach(group => {
+                    const groupCard = document.createElement('div');
+                    groupCard.className = 'group-card';
+                    groupCard.style.cssText = `
+                        background: white;
+                        border: 1px solid #e1e4e8;
+                        border-radius: 10px;
+                        padding: 15px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    `;
+                    groupCard.innerHTML = `
+                        <h4 style="margin: 0 0 10px 0; color: #4a90e2;">${group.name}</h4>
+                        <p style="margin: 5px 0; color: #666; font-size: 14px;">${group.description}</p>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                            <span style="background: #e8f0fe; color: #4a90e2; padding: 2px 8px; border-radius: 10px; font-size: 11px;">${group.members} members</span>
+                            <span style="background: #4caf50; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">${group.activity}</span>
+                        </div>
+                    `;
+                    
+                    groupCard.onclick = () => {
+                        joinPeerGroup(group);
+                    };
+                    
+                    groupsContainer.appendChild(groupCard);
+                });
+                
+                chatMessages.appendChild(groupsContainer);
+            }, 1000);
+        }
+        
+        function joinPeerGroup(group) {
+            addMessage(`Joining ${group.name}...`, true);
+            
+            setTimeout(() => {
+                addMessage(`Welcome to ${group.name}! 🎉`);
+                
+                const groupChat = document.createElement('div');
+                groupChat.className = 'group-chat';
+                groupChat.style.cssText = `
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 10px 0;
+                    max-height: 300px;
+                    overflow-y: auto;
+                `;
+                
+                const recentMessages = [
+                    { user: "Sarah M.", message: "Anyone else feeling overwhelmed with finals?", time: "2 min ago" },
+                    { user: "Alex K.", message: "Yes! But we got this 💪", time: "1 min ago" },
+                    { user: "Maria L.", message: "Remember to take breaks and breathe", time: "just now" }
+                ];
+                
+                recentMessages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.cssText = `
+                        background: white;
+                        padding: 10px;
+                        margin: 5px 0;
+                        border-radius: 5px;
+                        border-left: 3px solid #4a90e2;
+                    `;
+                    msgDiv.innerHTML = `
+                        <strong>${msg.user}</strong> <span style="color: #666; font-size: 11px;">${msg.time}</span>
+                        <div style="margin-top: 5px;">${msg.message}</div>
+                    `;
+                    groupChat.appendChild(msgDiv);
+                });
+                
+                const inputDiv = document.createElement('div');
+                inputDiv.style.cssText = `
+                    display: flex;
+                    margin-top: 10px;
+                `;
+                inputDiv.innerHTML = `
+                    <input type="text" placeholder="Type your message..." style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px 0 0 5px;">
+                    <button onclick="sendGroupMessage()" style="background: #4a90e2; color: white; border: none; padding: 8px 15px; border-radius: 0 5px 5px 0; cursor: pointer;">Send</button>
+                `;
+                
+                groupChat.appendChild(inputDiv);
+                chatMessages.appendChild(groupChat);
+            }, 1000);
+        }
+        
+        function sendGroupMessage() {
+            addMessage("Message sent to the group! 👥", true);
+        }
+        
+        // Therapist Sessions Implementation
+        function showTherapists() {
+            addMessage("🩺 Therapist Sessions", true);
+            
+            setTimeout(() => {
+                addMessage("Connect with licensed mental health professionals:");
+                
+                const therapists = [
+                    { name: "Dr. Sarah Johnson", specialty: "Anxiety & Depression", rating: 4.9, availability: "Available Now", experience: "8 years" },
+                    { name: "Dr. Michael Chen", specialty: "Cognitive Behavioral Therapy", rating: 4.8, availability: "Available in 2 hours", experience: "12 years" },
+                    { name: "Dr. Emily Rodriguez", specialty: "Stress Management", rating: 4.9, availability: "Available Tomorrow", experience: "6 years" },
+                    { name: "Dr. James Wilson", specialty: "Career Counseling", rating: 4.7, availability: "Available Now", experience: "10 years" }
+                ];
+                
+                const therapistsContainer = document.createElement('div');
+                therapistsContainer.className = 'therapists-container';
+                therapistsContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 15px;
+                    margin: 15px 0;
+                `;
+                
+                therapists.forEach(therapist => {
+                    const therapistCard = document.createElement('div');
+                    therapistCard.className = 'therapist-card';
+                    therapistCard.style.cssText = `
+                        background: white;
+                        border: 1px solid #e1e4e8;
+                        border-radius: 10px;
+                        padding: 20px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    `;
+                    therapistCard.innerHTML = `
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 60px; height: 60px; background: #4a90e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-right: 15px;">👩‍⚕️</div>
+                            <div>
+                                <h4 style="margin: 0; color: #4a90e2;">${therapist.name}</h4>
+                                <p style="margin: 5px 0; color: #666; font-size: 14px;">${therapist.specialty}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>⭐ ${therapist.rating}/5.0</span>
+                            <span style="color: #666;">${therapist.experience}</span>
+                        </div>
+                        <div style="background: #e8f5e8; color: #2e7d32; padding: 5px 10px; border-radius: 15px; text-align: center; font-size: 12px; margin-bottom: 15px;">
+                            ${therapist.availability}
+                        </div>
+                        <button onclick="bookTherapistSession('${therapist.name}')" style="width: 100%; background: #4a90e2; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
+                            Book Session
+                        </button>
+                    `;
+                    
+                    therapistsContainer.appendChild(therapistCard);
+                });
+                
+                chatMessages.appendChild(therapistsContainer);
+            }, 1000);
+        }
+        
+        function bookTherapistSession(therapistName) {
+            addMessage(`Booking session with ${therapistName}...`, true);
+            
+            setTimeout(() => {
+                addMessage("📅 Session Booking", true);
+                
+                const bookingForm = document.createElement('div');
+                bookingForm.className = 'booking-form';
+                bookingForm.style.cssText = `
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                
+                bookingForm.innerHTML = `
+                    <h4>Book Session with ${therapistName}</h4>
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Preferred Date:</label>
+                        <input type="date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Preferred Time:</label>
+                        <select style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option>9:00 AM</option>
+                            <option>10:00 AM</option>
+                            <option>11:00 AM</option>
+                            <option>2:00 PM</option>
+                            <option>3:00 PM</option>
+                            <option>4:00 PM</option>
+                        </select>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Session Type:</label>
+                        <select style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option>Video Call (50 min)</option>
+                            <option>Phone Call (30 min)</option>
+                            <option>In-Person (50 min)</option>
+                        </select>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Brief Description:</label>
+                        <textarea placeholder="What would you like to discuss?" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; height: 60px; resize: vertical;"></textarea>
+                    </div>
+                    <button onclick="confirmBooking()" style="width: 100%; background: #4a90e2; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                        Confirm Booking
+                    </button>
+                `;
+                
+                chatMessages.appendChild(bookingForm);
+            }, 1000);
+        }
+        
+        function confirmBooking() {
+            addMessage("✅ Session booked successfully! You'll receive a confirmation email shortly.", true);
+            
+            setTimeout(() => {
+                addMessage("Is there anything else I can help you with today?", true);
+            }, 1000);
+        }
+        
+        // Self-Help Resources Implementation
+        function showResources() {
+            addMessage("📚 Self-Help Resources", true);
+            
+            setTimeout(() => {
+                addMessage("Explore these helpful resources for your mental health journey:");
+                
+                const resources = [
+                    { category: "Articles", title: "Managing College Stress", type: "📄 Article", duration: "5 min read" },
+                    { category: "Videos", title: "Breathing Techniques", type: "🎥 Video", duration: "8 min" },
+                    { category: "Workbooks", title: "Anxiety Workbook", type: "📖 Workbook", duration: "Self-paced" },
+                    { category: "Podcasts", title: "Mindful Moments", type: "🎧 Podcast", duration: "15 min" },
+                    { category: "Apps", title: "Meditation Guide", type: "📱 App", duration: "Daily" },
+                    { category: "Worksheets", title: "Mood Tracking Sheet", type: "📋 Worksheet", duration: "Weekly" }
+                ];
+                
+                const resourcesContainer = document.createElement('div');
+                resourcesContainer.className = 'resources-container';
+                resourcesContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 15px;
+                    margin: 15px 0;
+                `;
+                
+                resources.forEach(resource => {
+                    const resourceCard = document.createElement('div');
+                    resourceCard.className = 'resource-card';
+                    resourceCard.style.cssText = `
+                        background: white;
+                        border: 1px solid #e1e4e8;
+                        border-radius: 10px;
+                        padding: 15px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    `;
+                    resourceCard.innerHTML = `
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 24px; margin-right: 10px;">${resource.type.split(' ')[0]}</span>
+                            <div>
+                                <h4 style="margin: 0; color: #4a90e2;">${resource.title}</h4>
+                                <p style="margin: 5px 0; color: #666; font-size: 12px;">${resource.category}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="background: #e8f0fe; color: #4a90e2; padding: 2px 8px; border-radius: 10px; font-size: 11px;">${resource.duration}</span>
+                            <button onclick="accessResource('${resource.title}')" style="background: #4a90e2; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                                Access
+                            </button>
+                        </div>
+                    `;
+                    
+                    resourcesContainer.appendChild(resourceCard);
+                });
+                
+                chatMessages.appendChild(resourcesContainer);
+            }, 1000);
+        }
+        
+        function accessResource(resourceTitle) {
+            addMessage(`Opening ${resourceTitle}...`, true);
+            
+            setTimeout(() => {
+                addMessage(`📖 ${resourceTitle}`, true);
+                
+                const resourceContent = document.createElement('div');
+                resourceContent.className = 'resource-content';
+                resourceContent.style.cssText = `
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                
+                if (resourceTitle === "Managing College Stress") {
+                    resourceContent.innerHTML = `
+                        <h3>📄 Managing College Stress</h3>
+                        <div style="line-height: 1.6;">
+                            <h4>1. Time Management</h4>
+                            <p>• Create a weekly schedule<br>• Break large tasks into smaller ones<br>• Use a planner or digital calendar</p>
+                            
+                            <h4>2. Healthy Habits</h4>
+                            <p>• Get 7-8 hours of sleep<br>• Eat regular, balanced meals<br>• Exercise for at least 30 minutes daily</p>
+                            
+                            <h4>3. Stress Relief Techniques</h4>
+                            <p>• Practice deep breathing<br>• Try meditation or yoga<br>• Take regular breaks</p>
+                            
+                            <h4>4. Seek Support</h4>
+                            <p>• Talk to friends and family<br>• Visit campus counseling services<br>• Join study groups</p>
+                        </div>
+                    `;
+                } else if (resourceTitle === "Breathing Techniques") {
+                    resourceContent.innerHTML = `
+                        <h3>🎥 Breathing Techniques</h3>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <div style="width: 150px; height: 150px; border: 3px solid #4a90e2; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; background: linear-gradient(45deg, #4a90e2, #5b67d6); color: white;">
+                                Breathe
+                            </div>
+                            <p style="margin-top: 15px;">Follow the circle - breathe in for 4 counts, hold for 4, breathe out for 4</p>
+                        </div>
+                    `;
+                } else {
+                    resourceContent.innerHTML = `
+                        <h3>📖 ${resourceTitle}</h3>
+                        <p>This resource is now available for you to explore. Take your time to go through the content at your own pace.</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                            <strong>Key Points:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Take notes as you go through the material</li>
+                                <li>Practice the techniques regularly</li>
+                                <li>Don't hesitate to ask questions</li>
+                                <li>Track your progress over time</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                chatMessages.appendChild(resourceContent);
+            }, 1000);
+        }
+        
+        // Career Assessment Implementation
+        function startCareerAssessment() {
+            addMessage("🎯 Career Assessment", true);
+            
+            setTimeout(() => {
+                addMessage("Let's explore your career interests and strengths. This will help guide your professional development:");
+                
+                const careerQuestions = [
+                    { question: "What type of work environment do you prefer?", options: ["Office", "Remote", "Field work", "Mixed"] },
+                    { question: "What motivates you most in a job?", options: ["Helping others", "Creative expression", "Problem solving", "Leadership"] },
+                    { question: "How do you prefer to work?", options: ["Independently", "In teams", "Both equally", "Depends on the task"] },
+                    { question: "What are your strongest skills?", options: ["Communication", "Technical", "Analytical", "Creative"] }
+                ];
+                
+                let currentQuestion = 0;
+                let answers = [];
+                
+                function showCareerQuestion() {
+                    if (currentQuestion >= careerQuestions.length) {
+                        showCareerResults(answers);
+                        return;
+                    }
+                    
+                    const question = careerQuestions[currentQuestion];
+                    addMessage(`Question ${currentQuestion + 1}: ${question.question}`, true);
+                    
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'career-options';
+                    optionsContainer.style.cssText = `
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 10px;
+                        margin: 15px 0;
+                    `;
+                    
+                    question.options.forEach(option => {
+                        const optionButton = document.createElement('button');
+                        optionButton.className = 'career-option';
+                        optionButton.style.cssText = `
+                            background: white;
+                            border: 2px solid #4a90e2;
+                            border-radius: 10px;
+                            padding: 15px;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            text-align: center;
+                        `;
+                        optionButton.textContent = option;
+                        
+                        optionButton.onclick = () => {
+                            answers.push(option);
+                            currentQuestion++;
+                            showCareerQuestion();
+                        };
+                        
+                        optionsContainer.appendChild(optionButton);
+                    });
+                    
+                    chatMessages.appendChild(optionsContainer);
+                }
+                
+                showCareerQuestion();
+            }, 1000);
+        }
+        
+        function showCareerResults(answers) {
+            addMessage("📊 Your Career Assessment Results", true);
+            
+            setTimeout(() => {
+                const resultsContainer = document.createElement('div');
+                resultsContainer.className = 'career-results';
+                resultsContainer.style.cssText = `
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                
+                resultsContainer.innerHTML = `
+                    <h3>🎯 Career Profile</h3>
+                    <div style="background: #e8f0fe; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                        <h4>Based on your responses, you might be interested in:</h4>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Mental Health Counseling</li>
+                            <li>Human Resources</li>
+                            <li>Social Work</li>
+                            <li>Education</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>📈 Recommended Next Steps:</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h5>🎓 Education</h5>
+                            <p>Consider relevant courses or certifications</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h5>💼 Experience</h5>
+                            <p>Look for internships or volunteer opportunities</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h5>🤝 Networking</h5>
+                            <p>Connect with professionals in your field</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="getCareerResources()" style="width: 100%; background: #4a90e2; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px;">
+                        Get Career Resources
+                    </button>
+                `;
+                
+                chatMessages.appendChild(resultsContainer);
+            }, 1000);
+        }
+        
+        function getCareerResources() {
+            addMessage("📚 Career Development Resources", true);
+            
+            setTimeout(() => {
+                const resourcesContainer = document.createElement('div');
+                resourcesContainer.className = 'career-resources';
+                resourcesContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 15px;
+                    margin: 15px 0;
+                `;
+                
+                const resources = [
+                    { title: "Resume Builder", description: "Create a professional resume", icon: "📝" },
+                    { title: "Interview Prep", description: "Practice common interview questions", icon: "🎤" },
+                    { title: "Job Search", description: "Find relevant job opportunities", icon: "🔍" },
+                    { title: "Skill Assessment", description: "Identify areas for improvement", icon: "📊" }
+                ];
+                
+                resources.forEach(resource => {
+                    const resourceCard = document.createElement('div');
+                    resourceCard.className = 'career-resource-card';
+                    resourceCard.style.cssText = `
+                        background: white;
+                        border: 1px solid #e1e4e8;
+                        border-radius: 10px;
+                        padding: 15px;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    `;
+                    resourceCard.innerHTML = `
+                        <div style="font-size: 32px; margin-bottom: 10px;">${resource.icon}</div>
+                        <h4 style="margin: 0 0 10px 0; color: #4a90e2;">${resource.title}</h4>
+                        <p style="margin: 0; color: #666; font-size: 14px;">${resource.description}</p>
+                    `;
+                    
+                    resourceCard.onclick = () => {
+                        addMessage(`Opening ${resource.title}...`, true);
+                        setTimeout(() => {
+                            addMessage(`${resource.title} is now available for you to use!`, true);
+                        }, 1000);
+                    };
+                    
+                    resourcesContainer.appendChild(resourceCard);
+                });
+                
+                chatMessages.appendChild(resourcesContainer);
+            }, 1000);
+        }
+        
+        // Skill Development Implementation
+        function showSkillDevelopment() {
+            addMessage("📈 Skill Development", true);
+            
+            setTimeout(() => {
+                addMessage("Enhance your professional skills with these development opportunities:");
+                
+                const skillCategories = [
+                    { 
+                        category: "Communication Skills", 
+                        skills: ["Public Speaking", "Writing", "Active Listening", "Presentation Skills"],
+                        icon: "💬"
+                    },
+                    { 
+                        category: "Technical Skills", 
+                        skills: ["Programming", "Data Analysis", "Digital Marketing", "Project Management"],
+                        icon: "💻"
+                    },
+                    { 
+                        category: "Soft Skills", 
+                        skills: ["Leadership", "Teamwork", "Problem Solving", "Time Management"],
+                        icon: "🤝"
+                    },
+                    { 
+                        category: "Mental Health Skills", 
+                        skills: ["Crisis Intervention", "Counseling Techniques", "Mindfulness Training", "Stress Management"],
+                        icon: "🧠"
+                    }
+                ];
+                
+                const skillsContainer = document.createElement('div');
+                skillsContainer.className = 'skills-container';
+                skillsContainer.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 15px;
+                    margin: 15px 0;
+                `;
+                
+                skillCategories.forEach(category => {
+                    const categoryCard = document.createElement('div');
+                    categoryCard.className = 'skill-category-card';
+                    categoryCard.style.cssText = `
+                        background: white;
+                        border: 1px solid #e1e4e8;
+                        border-radius: 10px;
+                        padding: 20px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    `;
+                    categoryCard.innerHTML = `
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <span style="font-size: 24px; margin-right: 10px;">${category.icon}</span>
+                            <h4 style="margin: 0; color: #4a90e2;">${category.category}</h4>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            ${category.skills.map(skill => `
+                                <span style="display: inline-block; background: #e8f0fe; color: #4a90e2; padding: 4px 8px; border-radius: 12px; font-size: 12px; margin: 2px;">${skill}</span>
+                            `).join('')}
+                        </div>
+                        <button onclick="exploreSkillCategory('${category.category}')" style="width: 100%; background: #4a90e2; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
+                            Explore Skills
+                        </button>
+                    `;
+                    
+                    skillsContainer.appendChild(categoryCard);
+                });
+                
+                chatMessages.appendChild(skillsContainer);
+            }, 1000);
+        }
+        
+        function exploreSkillCategory(categoryName) {
+            addMessage(`Exploring ${categoryName}...`, true);
+            
+            setTimeout(() => {
+                addMessage(`📚 ${categoryName} Development`, true);
+                
+                const developmentContent = document.createElement('div');
+                developmentContent.className = 'skill-development-content';
+                developmentContent.style.cssText = `
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                
+                developmentContent.innerHTML = `
+                    <h3>🎯 ${categoryName} Development Plan</h3>
+                    <div style="margin: 20px 0;">
+                        <h4>📖 Recommended Courses:</h4>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Introduction to ${categoryName}</li>
+                            <li>Advanced ${categoryName} Techniques</li>
+                            <li>Practical Applications Workshop</li>
+                            <li>Certification Program</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <h4>🛠️ Practice Activities:</h4>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Daily practice exercises</li>
+                            <li>Peer review sessions</li>
+                            <li>Real-world projects</li>
+                            <li>Mentorship opportunities</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <h4>📊 Progress Tracking:</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Current Level: Beginner</span>
+                                <span>Target Level: Intermediate</span>
+                            </div>
+                            <div style="background: #e9ecef; height: 20px; border-radius: 10px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #4a90e2, #5b67d6); height: 100%; width: 25%; border-radius: 10px;"></div>
+                            </div>
+                            <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">25% Complete - Keep going!</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="startSkillDevelopment()" style="width: 100%; background: #4a90e2; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px;">
+                        Start Development Plan
+                    </button>
+                `;
+                
+                chatMessages.appendChild(developmentContent);
+            }, 1000);
+        }
+        
+        function startSkillDevelopment() {
+            addMessage("🚀 Starting your skill development journey!", true);
+            
+            setTimeout(() => {
+                addMessage("Your personalized development plan is now active. You'll receive daily exercises and progress updates.", true);
+            }, 1000);
+        }
+        
+        function continueAssessment(rating) {
+            addMessage(rating.toString(), true);
+            
+            setTimeout(() => {
+                addMessage("Thank you. How often have you felt nervous or stressed in the past week?");
+                
+                const quickReplies = document.createElement('div');
+                quickReplies.className = 'quick-replies';
+                
+                const frequencies = ["Rarely", "Sometimes", "Often", "Almost always"];
+                frequencies.forEach(freq => {
+                    const button = document.createElement('button');
+                    button.className = 'quick-reply';
+                    button.textContent = freq;
+                    button.onclick = function() {
+                        finishAssessment();
+                    };
+                    quickReplies.appendChild(button);
+                });
+                
+                const messageDiv = chatMessages.lastChild;
+                messageDiv.appendChild(quickReplies);
+            }, 1000);
+        }
+        
+        function finishAssessment() {
+            addMessage("Almost always", true);
+            
+            setTimeout(() => {
+                addMessage("Thanks for completing the assessment. Based on your responses, I've generated a personalized mental health analysis for you.");
+                
+                // Show assessment results
+                assessmentContainer.style.display = 'block';
+                renderChart();
+                
+                // Scroll to results
+                setTimeout(() => {
+                    assessmentContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            }, 1000);
+        }
+        
+        // Initial chart render
+        window.onload = function() {
+            renderChart();
+        };
+    </script>
+</body>
+</html>
